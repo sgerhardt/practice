@@ -1,31 +1,21 @@
 package leetCode
 
 func lengthOfLongestSubstring(s string) int {
-	n := int32(len(s))
-	ans := int32(0)
-	charInts := make([]int32, len(s))
-	for i, c := range s {
-		charInts[i] = c
-	}
-
-	charToIndex := map[string]int32{}
-	// using a "sliding window" which is two indexes keeping track of where we are in the string.
-	for j, i := int32(0), int32(0); j < n; j++ {
-		if index, ok := charToIndex[string(charInts[j])]; ok {
-			// We've come across a duplicate character, so we bump our lower index
-			i = getMax(index, i)
+	charIndex := make(map[rune]int)
+	// start is where we start counting from in the string
+	start, maxLength := 0, 0
+	for i, char := range s {
+		if prevIndex, found := charIndex[char]; found && prevIndex >= start {
+			// if we found a duplicate character, we move the left index that we search from
+			start = prevIndex + 1
 		}
-		//keep track of our longest string
-		ans = getMax(ans, j-i+1)
-		charToIndex[string(charInts[j])] = j + 1
+		charIndex[char] = i
+		// get the current length of the string, which is the current index and set it to max if necessary
+		currentLength := i - start + 1
+		if currentLength > maxLength {
+			maxLength = currentLength
+		}
 	}
-	return int(ans)
-}
 
-func getMax(i, j int32) int32 {
-	if i > j {
-		return i
-	} else {
-		return j
-	}
+	return maxLength
 }
